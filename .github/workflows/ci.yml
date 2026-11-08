@@ -1,0 +1,37 @@
+name: Integracao Continua
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obter codigo
+        uses: actions/checkout@v7
+      - name: Preparar Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Verificar sintaxe JavaScript
+        run: npm run check
+      - name: Executar testes automatizados
+        run: npm test
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obter codigo
+        uses: actions/checkout@v7
+      - name: Preparar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.14.0'
+      - name: Verificar formatacao
+        run: terraform -chdir=terraform fmt -check
+      - name: Inicializar Terraform
+        run: terraform -chdir=terraform init -backend=false
+      - name: Validar Terraform
+        run: terraform -chdir=terraform validate

@@ -1,0 +1,6 @@
+.git
+.github
+terraform
+node_modules
+tests
+*.zip
