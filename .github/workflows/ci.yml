@@ -38,7 +38,7 @@ jobs:
 
   entrega:
     name: Build e Publicação Docker
-    needs: [testes, terraform]
+    needs: [testes, terraform, seguranca]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
@@ -67,4 +67,25 @@ jobs:
           tags: |
             ghcr.io/dreher06/projeto-devops-tarefas:latest
             ghcr.io/dreher06/projeto-devops-tarefas:${{ github.sha }}
+      
+  seguranca:
+    name: Auditoria de Segurança
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obter código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Verificar vulnerabilidades
+        run: npm audit --omit=dev --audit-level=high
+
 
